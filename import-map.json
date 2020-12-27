@@ -1,0 +1,7 @@
+{
+    "imports": {
+        "std/": "https://deno.land/std/",
+        "third/": "https://deno.land/x/",
+        "baseutil/": "https://gitee.com/berylsoft/baseutil/raw/main/"
+    }
+}
