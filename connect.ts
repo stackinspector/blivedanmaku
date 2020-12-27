@@ -28,7 +28,7 @@ const bootstraper = async (config: Config): Promise<Server> => {
     }
 }
 
-const init = (config: Config, server: Server): [types, Uint8Array] => [types.init_req, encodeText(JSON.stringify({
+const init = (config: Config, server: Server): [types.init_req, Uint8Array] => [types.init_req, encodeText(JSON.stringify({
     uid: 0,
     roomid: config.room,
     protover: 2,
@@ -38,5 +38,5 @@ const init = (config: Config, server: Server): [types, Uint8Array] => [types.ini
     key: server.token
 }))]
 
-const heartbeat = (): [types, Uint8Array] => [types.heartbeat_req, encodeText({}.toString())]
+const heartbeat = (): [types.heartbeat_req, Uint8Array] => [types.heartbeat_req, encodeText({}.toString())]
 
