@@ -1,20 +1,8 @@
 import { randInt } from 'baseutil/random.ts'
-import type { Source } from './codec.ts'
-import { types } from './codec.ts'
 import type { Dict } from 'baseutil/fetchlot.ts'
-export type { Config }
+import type { Source, Config, Server } from './schema.ts'
+import { types } from './schema.ts'
 export { bootstraper, init, heartbeat }
-
-interface Config {
-    room: number
-    usekey: boolean
-    client: string
-}
-
-interface Server {
-    server: string
-    token?: string
-}
 
 const bootstraper = async (config: Config): Promise<Server> => {
     const info = (await (await fetch(
@@ -38,7 +26,6 @@ const init = (config: Config, server: Server): Source<Dict> => ({
         key: server.token
     }
 })
-
 
 const heartbeat = (): Source<string> => ({
     type: types.heartbeat_req,

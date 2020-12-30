@@ -1,35 +1,10 @@
 import { sumof } from 'baseutil/sum.ts'
-import type { bit } from 'baseutil/bindata.ts'
 import * as bindata from 'baseutil/bindata.ts'
-export type { Source, Target }
-export { types, encode, decode }
+import type { Target, reqtypes, Head } from './schema.ts'
+import { types, headbit } from './schema.ts'
+export { encode, decode }
 
-const headbit: bit[] = [32, 16, 16, 32, 32]
 const headlength = sumof(headbit) / 8
-
-enum types {
-    unknown,
-    init_req,
-    init_resp,
-    heartbeat_req,
-    heartbeat_resp,
-    json,
-    extjson,
-}
-
-interface Source<Data> {
-    type: types
-    data: Data
-}
-
-interface Target<T extends types> {
-    type: T
-    data: Uint8Array
-}
-
-type reqtypes = types.init_req | types.heartbeat_req
-
-type Head = [number, number, number]
 
 const encodeHead = (type: reqtypes): Head => {
     const wrap = (x: number): Head => [1, x, 1]
@@ -61,7 +36,6 @@ const encode = (pkg: Target<reqtypes>): ArrayBuffer =>
     bindata.concat(new Uint8Array(bindata.encode(
         [16 + pkg.data.byteLength, 16].concat(encodeHead(pkg.type)), headbit
     )), pkg.data).buffer
-
 
 const decode = (stream: ArrayBuffer): Target<types> => {
 
