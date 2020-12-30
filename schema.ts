@@ -30,6 +30,7 @@ interface Config {
     room: number
     usekey: boolean
     client: string
+    filename: string
 }
 
 interface Server {

@@ -7,7 +7,8 @@ export { getConfig, getServer, init, heartbeat }
 const getConfig = (args: string[]): Config => ({
     client: args[0],
     usekey: Boolean(Number(args[1])),
-    room: Number(args[2])
+    room: Number(args[2]),
+    filename: args[3]
 })
 
 const getServer = async (config: Config): Promise<Server> => {
