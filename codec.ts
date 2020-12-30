@@ -1,8 +1,11 @@
+import { sumof } from 'baseutil/sum.ts'
 import type { bit } from 'baseutil/bindata.ts'
 import * as bindata from 'baseutil/bindata.ts'
+export type { Source, Target }
 export { types, encode, decode }
 
 const headbit: bit[] = [32, 16, 16, 32, 32]
+const headlength = sumof(headbit) / 8
 
 enum types {
     unknown,
@@ -12,6 +15,16 @@ enum types {
     heartbeat_resp,
     json,
     extjson,
+}
+
+interface Source<Data> {
+    type: types
+    data: Data
+}
+
+interface Target<T extends types> {
+    type: T
+    data: Uint8Array
 }
 
 type reqtypes = types.init_req | types.heartbeat_req
@@ -44,13 +57,20 @@ const decodehead = (head: Head): types => {
     return types.unknown
 }
 
-const encode = (type: reqtypes, data: Uint8Array): ArrayBuffer =>
+const encode = (pkg: Target<reqtypes>): ArrayBuffer =>
     bindata.concat(new Uint8Array(bindata.encode(
-        [16 + data.byteLength, 16].concat(encodeHead(type)), headbit
-    )), data).buffer
+        [16 + pkg.data.byteLength, 16].concat(encodeHead(pkg.type)), headbit
+    )), pkg.data).buffer
 
 
-const decode = (stream: ArrayBuffer): [types, Uint8Array] => [
-    decodehead(bindata.decode(stream.slice(0, 16), headbit).slice(2, 5) as Head), new Uint8Array(stream.slice(16))
-]
+const decode = (stream: ArrayBuffer): Target<types> => {
+
+    const head = bindata.decode(stream.slice(0, headlength), headbit)
+
+    return {
+        type: decodehead(head.slice(2, 5) as Head),
+        data: new Uint8Array(stream.slice(headlength))
+    }
+
+}
 
