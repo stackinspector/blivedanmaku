@@ -31,6 +31,7 @@ interface Config {
     usekey: boolean
     client: string
     filename: string
+    log: boolean
 }
 
 interface Server {

@@ -11,6 +11,7 @@ ws.binaryType = 'arraybuffer'
 
 const dump = (data: Source<unknown>, tag: 'meta' | 'data') => {
     writelnSync(JSON.stringify(data), `${config.filename}_${tag}`)
+    console.log(tag.toUpperCase(), data)
 }
 
 const up = (data: Source<unknown>) => {
