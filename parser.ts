@@ -1,5 +1,6 @@
 import { encode as textEncode, decode as textDecode } from 'std/encoding/utf8.ts'
 import { encode as base64Encode } from 'std/encoding/base64.ts'
+// import { inflate } from 'third/zlib.es/mod.ts'
 import type { Dict } from 'baseutil/fetchlot.ts'
 import * as bindata from 'baseutil/bindata.ts'
 import type { Source, Target } from './schema.ts'
@@ -12,10 +13,9 @@ const u32Encode = (data: number) => new Uint8Array(bindata.encode([data], [32]))
 const u32Decode = (data: Uint8Array) => bindata.decode(data.buffer, [32])
 
 // const extjson = (src: Target<types>): Source<Source<unknown>>
-
 const extjson = (data: Uint8Array): string => base64Encode(data)
 
-const encode = (src: Source<unknown>): Uint8Array => {
+const _encode = (src: Source<unknown>): Uint8Array => {
     switch (src.type) {
         case types.json:
         case types.init_req:
@@ -31,7 +31,7 @@ const encode = (src: Source<unknown>): Uint8Array => {
     }
 }
 
-const decode = (src: Target<types>): unknown => {
+const _decode = (src: Target<types>): unknown => {
     switch (src.type) {
         case types.json:
         case types.init_req:
@@ -47,4 +47,14 @@ const decode = (src: Target<types>): unknown => {
             return null
     }
 }
+
+const encode = (src: Source<unknown>): Target<types> => ({
+    type: src.type,
+    data: _encode(src)
+})
+
+const decode = (src: Target<types>): Source<unknown> => ({
+    type: src.type,
+    data: _decode(src)
+})
 
