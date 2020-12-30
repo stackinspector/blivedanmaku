@@ -10,7 +10,7 @@ export { encode, decode }
 const jsonEncode = (data: Dict) => textEncode(JSON.stringify(data))
 const jsonDecode = (data: Uint8Array) => JSON.parse(textDecode(data)) as Dict
 const u32Encode = (data: number) => new Uint8Array(bindata.encode([data], [32]))
-const u32Decode = (data: Uint8Array) => bindata.decode(data.buffer, [32])
+const u32Decode = (data: Uint8Array) => bindata.decode(data.buffer, [32])[0]
 
 // const extjson = (src: Target<types>): Source<Source<unknown>>
 const extjson = (data: Uint8Array): string => base64Encode(data)
