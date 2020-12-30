@@ -1,5 +1,5 @@
 import type { bit } from 'baseutil/bindata.ts'
-export type { Source, Target, reqtypes, Head, Config, Server }
+export type { Source, Target, Head, Config, Server }
 export { types, headbit }
 
 const headbit: bit[] = [32, 16, 16, 32, 32]
@@ -23,8 +23,6 @@ interface Target<T extends types> {
     type: T
     data: Uint8Array
 }
-
-type reqtypes = types.init_req | types.heartbeat_req
 
 type Head = [number, number, number]
 
