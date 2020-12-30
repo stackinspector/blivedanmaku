@@ -1,37 +1,33 @@
 import { writelnSync } from 'baseutil/writeln.ts'
+import type { Source } from './schema.ts'
 import * as codec from './codec.ts'
-import type { Config } from './connect.ts'
+import * as parser from './parser.ts'
 import * as connect from './connect.ts'
 
-const production = 3
-const filename = (type: string) => `./live_${production}_${type}`;
-const config: Config = {
-    client: Deno.args[0],
-    usekey: Boolean(Number(Deno.args[1])),
-    room: Number(Deno.args[2])
-} as const
-const server = await connect.bootstraper(config)
+const config = connect.getConfig(Deno.args)
+const server = await connect.getServer(config)
+const ws = new WebSocket(server.server)
+ws.binaryType = 'arraybuffer'
 
-const wsConnect = new WebSocket(server.server)
-
-wsConnect.binaryType = 'arraybuffer'
-
-wsConnect.onopen = () => {
-
-    wsConnect.send(codec.encode(...connect.init(config, server)))
-
-    const encodedHeartbeat = codec.encode(...connect.heartbeat())
-    wsConnect.send(encodedHeartbeat)
-    setInterval(() => wsConnect.send(encodedHeartbeat), 30000)
-
+const dump = (data: Source<unknown>, tag: 'meta' | 'data') => {
+    writelnSync(JSON.stringify(data), `${config.filename}_${tag}`)
 }
 
-wsConnect.onmessage = ({ data }) => {
+const up = (data: Source<unknown>) => {
+    ws.send(codec.encode(parser.encode(data)))
+    dump(data, 'meta')
+}
 
-    console.log(codec.decode(data as ArrayBuffer))
+const down = (data: ArrayBuffer) => {
+    dump(parser.decode(codec.decode(data)), 'meta')
+}
 
-    // writelnSync(JSON.stringify(data as ArrayBuffer), filename('meta'))
-    // writelnSync(JSON.stringify(data as ArrayBuffer), filename('out'))
+ws.onopen = () => {
+    up(connect.init(config, server))
+    setInterval(() => up(connect.heartbeat()), 30000)
+}
 
+ws.onmessage = (ev: MessageEvent<ArrayBuffer>) => {
+    down(ev.data)
 }
 
