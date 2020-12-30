@@ -2,9 +2,15 @@ import { randInt } from 'baseutil/random.ts'
 import type { Dict } from 'baseutil/fetchlot.ts'
 import type { Source, Config, Server } from './schema.ts'
 import { types } from './schema.ts'
-export { bootstraper, init, heartbeat }
+export { getConfig, getServer, init, heartbeat }
 
-const bootstraper = async (config: Config): Promise<Server> => {
+const getConfig = (args: string[]): Config => ({
+    client: args[0],
+    usekey: Boolean(Number(args[1])),
+    room: Number(args[2])
+})
+
+const getServer = async (config: Config): Promise<Server> => {
     const info = (await (await fetch(
         `https://api.live.bilibili.com/xlive/web-room/v1/index/getDanmuInfo?id=${config.room}&type=0`
     )).json()).data as Dict
