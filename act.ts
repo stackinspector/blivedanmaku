@@ -12,7 +12,7 @@ ws.binaryType = 'arraybuffer'
 
 const dump = <T>(data: Event<T>, tag: 'meta' | 'data' | 'debug') => {
     writelnSync(JSON.stringify(data), `${config.filename}_${tag}`)
-    if (config.log) console.log(tag.toUpperCase(), data)
+    if (config.log) console.log(tag.toUpperCase(), Deno.inspect(data, { colors: true, depth: 5 }))
 }
 
 const up = (data: Source<unknown>) => {
