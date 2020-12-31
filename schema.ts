@@ -1,5 +1,5 @@
 import type { bit } from 'baseutil/bindata.ts'
-export type { Source, Target, Head, Config, Server }
+export type { Source, Target, Event, Head, Config, Server }
 export { types, headbit }
 
 const headbit: bit[] = [32, 16, 16, 32, 32]
@@ -22,6 +22,12 @@ interface Source<Data> {
 interface Target<T extends types> {
     type: T
     data: Uint8Array
+}
+
+interface Event<Data> {
+    type: 'up' | 'down' | 'formated'
+    time: number
+    data: Source<Data>
 }
 
 type Head = [number, number, number]
