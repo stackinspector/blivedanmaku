@@ -1,10 +1,9 @@
 import { encode as textEncode, decode as textDecode } from 'std/encoding/utf8.ts'
-import { encode as base64Encode } from 'std/encoding/base64.ts'
-// import { inflate } from 'third/zlib.es/mod.ts'
-import type { Dict } from 'baseutil/fetchlot.ts'
+import { inflate } from 'third/zlib.es/mod.ts'
 import * as bindata from 'baseutil/bindata.ts'
 import type { Source, Target } from './schema.ts'
 import { types } from './schema.ts'
+import * as codec from './codec.ts'
 export { encode, decode }
 
 const jsonEncode = (data: unknown): Uint8Array => textEncode(JSON.stringify(data))
@@ -12,8 +11,17 @@ const jsonDecode = (data: Uint8Array): unknown => JSON.parse(textDecode(data)) a
 const u32Encode = (data: number): Uint8Array => new Uint8Array(bindata.encode([data], [32]))
 const u32Decode = (data: Uint8Array): number => bindata.decode(data.buffer, [32])[0]
 
-// const extjson = (src: Target<types>): Source<Source<unknown>>
-const extjson = (data: Uint8Array): string => base64Encode(data)
+const extjson = (data: Uint8Array): Source<unknown>[] => {
+    const result: Uint8Array[] = []
+    const source = inflate(data)
+    let offset = 0
+    while (offset < source.byteLength) {
+        const length = new DataView(source.slice(offset).buffer).getUint32(0)
+        result.push(source.slice(offset, offset + length))
+        offset += length
+    }
+    return result.map(bin => decode(codec.decode(bin.buffer)))
+}
 
 const _encode = (src: Source<unknown>): Uint8Array => {
     switch (src.type) {
