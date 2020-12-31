@@ -4,6 +4,7 @@ import * as bindata from 'baseutil/bindata.ts'
 import type { Source, Target } from './schema.ts'
 import { types } from './schema.ts'
 import * as codec from './codec.ts'
+import { dump } from './act.ts'
 export { encode, decode }
 
 const jsonEncode = (data: unknown): Uint8Array => textEncode(JSON.stringify(data))
@@ -19,6 +20,7 @@ const extjson = (data: Uint8Array): Source<unknown>[] => {
         const length = new DataView(source.slice(offset).buffer).getUint32(0)
         result.push(source.slice(offset, offset + length))
         offset += length
+        dump<number[]>({ type: 'debug', time: Number(new Date()), data: [length, offset, source.byteLength] }, 'debug')
     }
     return result.map(bin => decode(codec.decode(bin.buffer)))
 }
