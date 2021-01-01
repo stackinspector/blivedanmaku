@@ -6,7 +6,7 @@ export { encode, decode }
 
 const headlength = sumof(headbit) / 8
 
-const encodeHead = (type: types): Head => {
+const _encode = (type: types): Head => {
     const wrap = (x: number): Head => [1, x, 1]
     switch (type) {
         case types.heartbeat_req: return wrap(2)
@@ -15,7 +15,7 @@ const encodeHead = (type: types): Head => {
     }
 }
 
-const decodehead = (head: Head): types => {
+const _decode = (head: Head): types => {
     if (head[1] === 5 && head[2] === 0) {
         // JSON data
         switch (head[0]) {
@@ -34,16 +34,22 @@ const decodehead = (head: Head): types => {
 }
 
 const encode = (pkg: Target<types>): ArrayBuffer =>
-    bindata.concat(new Uint8Array(bindata.encode(
-        [16 + pkg.data.byteLength, 16].concat(encodeHead(pkg.type)), headbit
-    )), pkg.data).buffer
+    bindata.concat(
+        new Uint8Array(
+            bindata.encode(
+                [headlength + pkg.data.byteLength, headlength].concat(_encode(pkg.type)),
+                headbit
+            )
+        ),
+        pkg.data
+    ).buffer
 
 const decode = (stream: ArrayBuffer): Target<types> => {
 
     const head = bindata.decode(stream.slice(0, headlength), headbit)
 
     return {
-        type: decodehead(head.slice(2, 5) as Head),
+        type: _decode(head.slice(2, 5) as Head),
         data: new Uint8Array(stream.slice(headlength))
     }
 
