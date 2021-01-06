@@ -16,16 +16,21 @@ const dump = <T>(data: Event<T>, tag: 'meta' | 'data' | 'debug') => {
 }
 
 const up = (data: Source<unknown>) => {
-    ws.send(codec.encode(parser.encode(data)))
     dump({ type: 'up', time: Number(new Date()), data }, 'meta')
+    return codec.encode(parser.encode(data))
+}
+
+const down = (data: ArrayBuffer, time: number) => {
+    dump({ type: 'down', time, data: parser.decode(codec.decode(data)) }, 'meta')
 }
 
 ws.onopen = () => {
-    up(connect.init(config, server))
-    setInterval(() => up(connect.heartbeat()), 30000)
+    ws.send(up(connect.init(config, server)))
+    const heartbeat = connect.heartbeat()
+    setInterval(() => ws.send(up(heartbeat)), 30000)
 }
 
 ws.onmessage = (ev: MessageEvent<ArrayBuffer>) => {
-    dump({ type: 'down', time: ev.timeStamp, data: parser.decode(codec.decode(ev.data)) }, 'meta')
+    down(ev.data, ev.timeStamp)
 }
 
