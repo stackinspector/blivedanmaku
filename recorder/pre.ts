@@ -7,7 +7,7 @@ export { config, dump, up, down }
 
 const config = getConfig(Deno.args)
 
-const dump = <T>(data: Event<T>, tag: 'meta' | 'data' | 'debug') => {
+const dump = <T>(data: Event<T>, tag: 'meta' | 'data' | 'debug' | 'error' | 'crash') => {
     writelnSync(JSON.stringify(data), `${config.filename}_${tag}`)
     if (config.log) console.log(tag.toUpperCase(), Deno.inspect(data, { colors: true, depth: 5 }))
 }

@@ -25,7 +25,7 @@ interface Target<T extends types> {
 }
 
 interface Event<Data> {
-    type: 'up' | 'down' | 'formated' | 'debug'
+    type: 'up' | 'down' | 'formated' | 'debug' | 'error' | 'crash'
     time: number
     data: Data
 }
