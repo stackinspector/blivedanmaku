@@ -4,7 +4,7 @@ import * as bindata from 'baseutil/bindata.ts'
 import type { Source, Target } from './schema.ts'
 import { types } from './schema.ts'
 import * as codec from './codec.ts'
-import { dump } from './act.ts'
+import { dump } from './pre.ts'
 export { encode, decode }
 
 const jsonEncode = (data: unknown): Uint8Array => textEncode(JSON.stringify(data))
