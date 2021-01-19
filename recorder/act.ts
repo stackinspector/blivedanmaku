@@ -1,8 +1,8 @@
 import * as connect from './connect.ts'
-import { config, up, down, report } from './pre.ts'
+import { config, up, down } from './pre.ts'
 
 const server = await connect.getServer(config)
-let ws = new WebSocket(server.server)
+const ws = new WebSocket(server.server)
 const initws = (thisws: WebSocket) => {
     thisws.binaryType = 'arraybuffer'
     thisws.onopen = () => {
@@ -13,6 +13,7 @@ const initws = (thisws: WebSocket) => {
     thisws.onmessage = (ev: MessageEvent<ArrayBuffer>) => {
         down(ev.data, ev.timeStamp)
     }
+    /*
     thisws.onerror = (ev) => {
         report(ev)
     }
@@ -21,6 +22,7 @@ const initws = (thisws: WebSocket) => {
         ws = new WebSocket(server.server)
         initws(ws)
     }
+    */
 }
 
 initws(ws)
