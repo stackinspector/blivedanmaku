@@ -1,16 +1,11 @@
-import { encode as textEncode, decode as textDecode } from 'std/encoding/utf8.ts'
+import { encode as encodeText, decode as decodeText } from 'std/encoding/utf8.ts'
 import { inflate } from 'third/zlib.es/mod.ts'
-import * as bindata from 'baseutil/bindata.ts'
+import { encodeUint, decodeUint } from 'baseutil/bindata.ts'
 import type { Source, Target } from './schema.ts'
 import { types } from './schema.ts'
 import * as codec from './codec.ts'
 import { dump } from './pre.ts'
 export { encode, decode }
-
-const jsonEncode = (data: unknown): Uint8Array => textEncode(JSON.stringify(data))
-const jsonDecode = (data: Uint8Array): unknown => JSON.parse(textDecode(data)) as unknown
-const u32Encode = (data: number): Uint8Array => new Uint8Array(bindata.encode([data], [32]))
-const u32Decode = (data: Uint8Array): number => bindata.decode(data.buffer, [32])[0]
 
 const extjson = (data: Uint8Array): Source<unknown>[] => {
     const result: Uint8Array[] = []
@@ -30,11 +25,11 @@ const _encode = (src: Source<unknown>): Uint8Array => {
         case types.json:
         case types.init_req:
         case types.init_resp:
-            return jsonEncode(src.data)
+            return encodeText(JSON.stringify(src.data))
         case types.heartbeat_req:
-            return textEncode(src.data as string)
+            return encodeText(src.data as string)
         case types.heartbeat_resp:
-            return u32Encode(src.data as number)
+            return new Uint8Array(encodeUint(src.data as number, 32))
         case types.extjson:
         case types.unknown:
             return new Uint8Array([])
@@ -46,11 +41,11 @@ const _decode = (src: Target<types>): unknown => {
         case types.json:
         case types.init_req:
         case types.init_resp:
-            return jsonDecode(src.data)
+            return JSON.parse(decodeText(src.data)) as unknown
         case types.heartbeat_req:
-            return textDecode(src.data)
+            return decodeText(src.data)
         case types.heartbeat_resp:
-            return u32Decode(src.data)
+            return decodeUint(src.data.buffer, 32)
         case types.extjson:
             return extjson(src.data)
         case types.unknown:
