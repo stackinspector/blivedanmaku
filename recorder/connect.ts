@@ -1,7 +1,7 @@
 import { randInt } from 'baseutil/random.ts'
 import type { Dict } from 'baseutil/fetchlot.ts'
 import type { Source, Config, Server } from './schema.ts'
-import { types } from './schema.ts'
+import { PackageType } from './schema.ts'
 export { getConfig, getServer, init, heartbeat }
 
 const getConfig = (args: string[]): Config => ({
@@ -23,7 +23,7 @@ const getServer = async (config: Config): Promise<Server> => {
 }
 
 const init = (config: Config, server: Server): Source<Dict> => ({
-    type: types.init_req,
+    type: PackageType.InitRequest,
     data: {
         uid: 0,
         roomid: config.room,
@@ -36,7 +36,7 @@ const init = (config: Config, server: Server): Source<Dict> => ({
 })
 
 const heartbeat = (): Source<string> => ({
-    type: types.heartbeat_req,
+    type: PackageType.HeartbeatRequest,
     data: {}.toString()
 })
 

@@ -2,12 +2,12 @@ import { encode as encodeText, decode as decodeText } from 'std/encoding/utf8.ts
 import { inflate } from 'third/zlib.es/mod.ts'
 import { encodeUint, decodeUint } from 'baseutil/bindata.ts'
 import type { Source, Target } from './schema.ts'
-import { types } from './schema.ts'
+import { PackageType } from './schema.ts'
 import * as codec from './codec.ts'
 import { dump } from './pre.ts'
 export { encode, decode }
 
-const extjson = (data: Uint8Array): Source<unknown>[] => {
+const unpack = (data: Uint8Array): Source<unknown>[] => {
     const result: Uint8Array[] = []
     const source = inflate(data)
     let offset = 0
@@ -22,43 +22,43 @@ const extjson = (data: Uint8Array): Source<unknown>[] => {
 
 const _encode = (src: Source<unknown>): Uint8Array => {
     switch (src.type) {
-        case types.json:
-        case types.init_req:
-        case types.init_resp:
+        case PackageType.Json:
+        case PackageType.InitRequest:
+        case PackageType.InitResponse:
             return encodeText(JSON.stringify(src.data))
-        case types.heartbeat_req:
+        case PackageType.HeartbeatRequest:
             return encodeText(src.data as string)
-        case types.heartbeat_resp:
+        case PackageType.HeartbeatResponse:
             return new Uint8Array(encodeUint(src.data as number, 32))
-        case types.extjson:
-        case types.unknown:
+        case PackageType.MultiJson:
+        case PackageType.Unknown:
             return new Uint8Array([])
     }
 }
 
-const _decode = (src: Target<types>): unknown => {
+const _decode = (src: Target<PackageType>): unknown => {
     switch (src.type) {
-        case types.json:
-        case types.init_req:
-        case types.init_resp:
+        case PackageType.Json:
+        case PackageType.InitRequest:
+        case PackageType.InitResponse:
             return JSON.parse(decodeText(src.data)) as unknown
-        case types.heartbeat_req:
+        case PackageType.HeartbeatRequest:
             return decodeText(src.data)
-        case types.heartbeat_resp:
+        case PackageType.HeartbeatResponse:
             return decodeUint(src.data.buffer, 32)
-        case types.extjson:
-            return extjson(src.data)
-        case types.unknown:
+        case PackageType.MultiJson:
+            return unpack(src.data)
+        case PackageType.Unknown:
             return null
     }
 }
 
-const encode = (src: Source<unknown>): Target<types> => ({
+const encode = (src: Source<unknown>): Target<PackageType> => ({
     type: src.type,
     data: _encode(src)
 })
 
-const decode = (src: Target<types>): Source<unknown> => ({
+const decode = (src: Target<PackageType>): Source<unknown> => ({
     type: src.type,
     data: _decode(src)
 })

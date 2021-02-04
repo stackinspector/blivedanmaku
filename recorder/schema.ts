@@ -1,25 +1,25 @@
 import type { bit } from 'baseutil/bindata.ts'
 export type { Source, Target, MyEvent, Head, Config, Server }
-export { types, headbit }
+export { PackageType, headbit }
 
 const headbit: bit[] = [32, 16, 16, 32, 32]
 
-enum types {
-    unknown,
-    init_req,
-    init_resp,
-    heartbeat_req,
-    heartbeat_resp,
-    json,
-    extjson,
+const enum PackageType {
+    Unknown,
+    InitRequest,
+    InitResponse,
+    HeartbeatRequest,
+    HeartbeatResponse,
+    Json,
+    MultiJson,
 }
 
 interface Source<Data> {
-    type: types
+    type: PackageType
     data: Data
 }
 
-interface Target<T extends types> {
+interface Target<T extends PackageType> {
     type: T
     data: Uint8Array
 }
