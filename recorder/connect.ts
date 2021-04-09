@@ -5,11 +5,10 @@ import { PackageType } from './schema.ts'
 export { getConfig, getServer, init, heartbeat }
 
 const getConfig = (args: string[]): Config => ({
-    client: args[0],
-    usekey: Boolean(Number(args[1])),
-    log: Boolean(Number(args[2])),
-    room: Number(args[3]),
-    filename: args[4],
+    usekey: Boolean(Number(args[0])),
+    log: Boolean(Number(args[1])),
+    room: Number(args[2]),
+    filename: args[3],
 })
 
 const getServer = async (config: Config): Promise<Server> => {
@@ -29,7 +28,6 @@ const init = (config: Config, server: Server): Source<Dict> => ({
         roomid: config.room,
         protover: 2,
         platform: 'web',
-        clientver: config.client,
         type: 2,
         key: server.token
     }

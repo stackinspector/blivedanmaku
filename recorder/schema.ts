@@ -36,7 +36,6 @@ type Head = [number, number, number]
 interface Config {
     room: number
     usekey: boolean
-    client: string
     filename: string
     log: boolean
 }
