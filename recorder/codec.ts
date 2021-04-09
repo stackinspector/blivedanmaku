@@ -37,7 +37,7 @@ const encode = (pkg: Target<PackageType>): ArrayBuffer =>
     bindata.concat(
         new Uint8Array(
             bindata.encode(
-                [headlength + pkg.data.byteLength, headlength].concat(_encode(pkg.type)),
+                [headlength + pkg.data.byteLength, headlength, ..._encode(pkg.type)],
                 headbit
             )
         ),
