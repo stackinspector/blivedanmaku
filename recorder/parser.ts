@@ -1,4 +1,4 @@
-import { encode as encodeText, decode as decodeText } from 'std/encoding/utf8.ts'
+import { encodeText, decodeText } from 'baseutil/textcodec.ts'
 import { inflate } from 'third/zlib.es/mod.ts'
 import { encodeUint, decodeUint } from 'baseutil/bindata.ts'
 import type { Source, Target } from './schema.ts'
