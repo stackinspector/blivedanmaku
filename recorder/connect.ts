@@ -12,12 +12,17 @@ const getConfig = (args: string[]): Config => ({
 })
 
 const getServer = async (config: Config): Promise<Server> => {
-    const info = (await (await fetch(
+    const info: {
+        host_list: {
+            host: string
+        }[]
+        token: string
+    } = (await (await fetch(
         `https://api.live.bilibili.com/xlive/web-room/v1/index/getDanmuInfo?id=${config.room}&type=0`
-    )).json()).data as Dict
+    )).json()).data
     return {
-        server: `wss://${(info.host_list as Dict[])[config.usekey ? randInt(2) : 2].host as string}/sub`,
-        token: config.usekey ? info.token as string : void 0
+        server: `wss://${info.host_list[config.usekey ? randInt(2) : 2].host}/sub`,
+        token: config.usekey ? info.token : void 0
     }
 }
 
