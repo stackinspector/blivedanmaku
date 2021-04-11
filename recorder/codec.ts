@@ -45,13 +45,10 @@ const encode = (pkg: Target<PackageType>): ArrayBuffer =>
     ).buffer
 
 const decode = (stream: ArrayBuffer): Target<PackageType> => {
-
     const head = bindata.decode(stream.slice(0, headlength), headbit)
-
     return {
         type: _decode(head.slice(2, 5) as Head),
         data: new Uint8Array(stream.slice(headlength))
     }
-
 }
 
